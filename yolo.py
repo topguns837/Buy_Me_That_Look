@@ -159,9 +159,10 @@ def driver(img_path) :
             fps_label = "FPS: %.2f" % fps
             cv2.putText(frame, fps_label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)'''
         #raw_img = cv2.imread('config/sample5.jpg')
+        
         raw_img = cv2.imread('temp/input.jpg')
 
-        print(boxes)
+        #print(boxes)
         #print()
 
         for index in range(len(boxes)) :

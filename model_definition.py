@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator 
 from tensorflow.keras.preprocessing import image
