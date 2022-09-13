@@ -18,7 +18,7 @@ filename = "input.jpg"
 #value = st.slider('val')  # this is a widget
 #st.write(value, 'squared is', value * value)
 
-st.write("Myntra Fashion Recommender")
+st.header("Myntra Fashion Recommender")
 
 def save_uploadedfile(uploadedfile):
     global filename
@@ -48,7 +48,7 @@ if image_file is not None :
         yolo_output = Image.open('temp/yolo_output.jpg')
         st.image(yolo_output, caption='Input Image')
 
-        data_json = pd.read_csv(os.path.join('Product', 'data_json_features.csv'))
+        data_json = pd.read_csv(os.path.join('Product', 'data_json_new.csv'))
         
         for file in os.listdir('user_products') :
             print("for loop")
@@ -65,13 +65,13 @@ if image_file is not None :
             new_feature_scaled = np.array(new_feature_scaled).squeeze()
 
             old_embedding = np.load('Product/features_pca.pkl', allow_pickle = True)
-            old_features = np.load('Product/features_np.pkl', allow_pickle = True)
+            old_features = np.load('Product/features_np_2.pkl', allow_pickle = True)
 
-            topwear_features = old_features[0:70]
-            bottomwear_features = old_features[71:159]
-            footwear_features = old_features[160 : 259]
-            eyewear_features = old_features[260 : 358]
-            handbag_features = old_features[359 : 458]
+            topwear_features = old_features[0:187]
+            bottomwear_features = old_features[187 : 387]
+            footwear_features = old_features[387 : 590]
+            eyewear_features = old_features[591 : 792]
+            handbag_features = old_features[793 : 994]
 
             base_index = 0
 
@@ -81,32 +81,32 @@ if image_file is not None :
                 neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(topwear_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
                 base_index = 0
-                st.write("\n Topwear Recommendations \n")
+                st.header("\n Topwear Recommendations \n")
             
             elif file == "Bottomwear.jpg" :
                 neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(bottomwear_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
-                base_index = 71
-                st.write("\n Bottomwear Recommendations \n")
+                base_index = 187
+                st.header("\n Bottomwear Recommendations \n")
 
             elif file == "Footwear.jpg" :
                 neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(footwear_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
-                base_index = 160
-                st.write("\n Footwear Recommendations \n")
+                base_index = 387
+                st.header("\n Footwear Recommendations \n")
 
             elif file == "Eyewear.jpg" :
                 neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(eyewear_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
-                base_index = 260
-                st.write("\n Eyewear Recommendations \n")           
+                base_index = 591
+                st.header("\n Eyewear Recommendations \n")           
                 
 
             elif file == "Handbag.jpg" :
                 eighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(handbag_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
-                base_index = 359
-                st.write("\n Handbag Recommendations \n")
+                base_index = 792
+                st.header("\n Handbag Recommendations \n")
 
             else:
                 pass
@@ -136,20 +136,20 @@ if image_file is not None :
 
             counter = 0
 
-            try :
+            #try :
 
-                for img_path in filenames :
-                    #img = cv2.imread(img_path)
-                    img = Image.open(img_path)
-                    #img = img.resize((600, 400))
-                    st.image(img, caption='test', width  = 200)
-                    st.write(names[counter])
-                    st.write("Price : " +  str(prices[counter]) + " \u20B9")
-                    st.write(links[counter])
-                    counter += 1
+            for img_path in filenames :
+                #img = cv2.imread(img_path)
+                img = Image.open(img_path)
+                #img = img.resize((600, 400))
+                st.image(img, caption='test', width  = 200)
+                st.write(names[counter])
+                st.write("Price : " +  str(prices[counter]) + " \u20B9")
+                st.write(links[counter])
+                counter += 1
 
-            except :
-                pass
+            #except :
+                #pass
 
 
 
