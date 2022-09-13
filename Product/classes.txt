@@ -1,0 +1,5 @@
+Topwear
+Bottomwear
+Footwear
+Eyewear
+Handbag
