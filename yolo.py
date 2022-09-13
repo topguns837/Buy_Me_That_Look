@@ -159,12 +159,15 @@ def driver(img_path) :
             fps_label = "FPS: %.2f" % fps
             cv2.putText(frame, fps_label, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)'''
         #raw_img = cv2.imread('config/sample5.jpg')
-        raw_img = frame
+        raw_img = cv2.imread('temp/input.jpg')
+
+        print(boxes)
+        #print()
 
         for index in range(len(boxes)) :
             box = boxes[index]
             #category = class_ids[index]
-            category = Categories[index]
+            category = Categories[class_ids[index]]
 
             cropped_img = raw_img[box[1] : box[1] + box[3], box[0] : box[0] + box[2]]
             cv2.imwrite(os.path.join('user_products', category) + '.jpg', cropped_img)
