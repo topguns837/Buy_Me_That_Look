@@ -37,10 +37,10 @@ if image_file is not None :
     save_uploadedfile(image_file)
 
     ps = PoseEstimation()
-    print(filename)
+    #print(filename)
 
     image_path = os.path.join("temp", filename)
-    print(image_path)    
+    #print(image_path)    
 
     if ps.driver(image_path) :
         st.write("Full shot")
@@ -48,7 +48,8 @@ if image_file is not None :
         yolo_output = Image.open('temp/yolo_output.jpg')
         st.image(yolo_output, caption='Input Image')
 
-        data_json = pd.read_csv(os.path.join('Product', 'data_json_new.csv'))
+        data_json = pd.read_csv(os.path.join('Product', 'data_json_new_copy.csv'))
+        print(data_json.columns)
         
         for file in os.listdir('user_products') :
             print("for loop")
@@ -76,34 +77,46 @@ if image_file is not None :
             base_index = 0
 
             neighbors, distances, indices = [], [], []
+
+            sex = 'Women'
+            base_index = 0
             
             if file == "Topwear.jpg" :
-                neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(topwear_features)
+                features = data_json[(data_json['category'] == 'topwear') & (data_json['sex']==sex)]['features'].tolist()
+                #features = data_json[(data_json['category'] == 'topwear') & (data_json['sex']=='Women')]['features'].tolist()
+
+                #neighbors = NearestNeighbors(n_neighbors=8, algorithm='brute', metric='euclidean').fit(list(features))
+                #distances, indices = neighbors.kneighbors([new_feature])
+
+                neighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(list(topwear_features))
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
                 base_index = 0
                 st.header("\n Topwear Recommendations \n")
             
             elif file == "Bottomwear.jpg" :
-                neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(bottomwear_features)
+                features = data_json[(data_json['category'] == 'bottomwear') & (data_json['sex']==sex)]['features'].tolist()
+
+                neighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(list(bottomwear_features))
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
                 base_index = 187
                 st.header("\n Bottomwear Recommendations \n")
 
             elif file == "Footwear.jpg" :
-                neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(footwear_features)
+                features = np.array(data_json[(data_json['category'] == 'footwear') & (data_json['sex']==sex)]['features'].tolist())
+                print(features.shape)
+
+                #try :
+                neighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(footwear_features)
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
                 base_index = 387
                 st.header("\n Footwear Recommendations \n")
-
-            elif file == "Eyewear.jpg" :
-                neighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(eyewear_features)
-                distances, indices = neighbors.kneighbors([new_feature_scaled])
-                base_index = 591
-                st.header("\n Eyewear Recommendations \n")           
-                
+                #except :
+                    #pass
 
             elif file == "Handbag.jpg" :
-                eighbors = NearestNeighbors(n_neighbors=5, algorithm='brute', metric='euclidean').fit(handbag_features)
+                features = data_json[(data_json['category'] == 'handbag') & (data_json['sex']==sex)]['features'].tolist()
+
+                eighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(list(handbag_features))
                 distances, indices = neighbors.kneighbors([new_feature_scaled])
                 base_index = 792
                 st.header("\n Handbag Recommendations \n")
@@ -114,12 +127,12 @@ if image_file is not None :
 
 
             indexes = indices
-            print(indexes)
+            #print(indexes)
 
             root_dir = 'Product'
 
             filenames = []
-            category = data_json.iloc[indices[0] + base_index,:]['category']
+            category = data_json.iloc[indices[0],:]['category']
 
             names = []
             prices = []
@@ -128,9 +141,14 @@ if image_file is not None :
             for index in indexes[0] :
                 img_path = os.path.join(root_dir, data_json.iloc[index + base_index,:]['category'], data_json.iloc[index + base_index,:]['name']) + '.jpg'
                 filenames.append(img_path)
-                links.append(data_json.iloc[index + base_index,:]['link'])
-                names.append(data_json.iloc[index + base_index, :]['name'])
-                prices.append(data_json.iloc[index + base_index, : ]['price'])
+                if data_json.iloc[index + base_index,:]['sex']==sex :
+
+                    links.append(data_json.iloc[index + base_index,:]['link'])
+                    names.append(data_json.iloc[index + base_index, :]['name'])
+                    prices.append(data_json.iloc[index + base_index, : ]['price'])
+
+                if len(links)>=5:
+                    break
 
             #print(filenames)
 
@@ -139,14 +157,21 @@ if image_file is not None :
             #try :
 
             for img_path in filenames :
-                #img = cv2.imread(img_path)
-                img = Image.open(img_path)
-                #img = img.resize((600, 400))
-                st.image(img, caption='test', width  = 200)
-                st.write(names[counter])
-                st.write("Price : " +  str(prices[counter]) + " \u20B9")
-                st.write(links[counter])
-                counter += 1
+                try :
+
+                    #img = cv2.imread(img_path)
+                    img = Image.open(img_path)
+                    #img = img.resize((600, 400))
+                    name, link = names[counter], links[counter]
+                    st.image(img, caption='test', width  = 200)
+                    st.write(name)
+                    st.write("Price : " +  str(prices[counter]) + " \u20B9")
+                    st.write(link)
+                    counter += 1
+                    if counter>=5 :
+                        break
+                except :
+                    pass
 
             #except :
                 #pass
