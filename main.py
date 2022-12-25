@@ -1,22 +1,37 @@
 import streamlit as st
 import os
+import glob
 import cv2
 from PIL import Image
 import pandas as pd
+import numpy as np
 import model_definition
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import NearestNeighbors
+from pathlib import Path
 
 from pose_estimation import PoseEstimation
-from yolo import *
+from yolo import driver
+
+import warnings
+warnings.filterwarnings("ignore")
+
+
+def clear_folder(path) :
+    [f.unlink() for f in Path(path).glob("*") if f.is_file()] 
+
+def save_uploadedfile(uploadedfile):
+    #global filename   
+
+    with open(os.path.join("temp","input.jpg"),"wb") as f:
+        f.write(uploadedfile.getbuffer())    
+    
+
+    return st.success("Successfuly uploaded file ")
+    
 
 
 os.chdir(os.getcwd())
-
-filename = "input.jpg"
-
-#value = st.slider('val')  # this is a widget
-#st.write(value, 'squared is', value * value)
 
 st.header("Myntra Fashion Recommender")
 
@@ -32,15 +47,7 @@ else :
     sex = "Women"
 
 
-def save_uploadedfile(uploadedfile):
-    global filename
-    #filename = uploadedfile.name
 
-    with open(os.path.join("temp","input.jpg"),"wb") as f:
-        f.write(uploadedfile.getbuffer())    
-    
-
-    return st.success("Successfuly uploaded file ")
      
 
 image_file = st.file_uploader("Enter a full-shot image", type = ['png','jpeg','jpg'])
@@ -49,28 +56,26 @@ if image_file is not None :
     save_uploadedfile(image_file)
 
     ps = PoseEstimation()
-    #print(filename)
+    
 
-    image_path = os.path.join("temp", filename)
-    #print(image_path)    
+    image_path = os.path.join("temp", "input.jpg")
+       
 
     if ps.driver(image_path) :
-        #st.write("Full shot")
+        
         driver('temp/input.jpg')
         yolo_output = Image.open('temp/yolo_output.jpg')
         st.image(yolo_output, caption='Input Image')
 
         data_json = pd.read_csv(os.path.join('Product', 'data_json_new_copy.csv'))
-        print(data_json.columns)
-
         
-        #print(sex)
+
 
         if True:
 
         
             for file in os.listdir('user_products') :
-                print("for loop")
+                
                 new_embedding = model_definition.extract_features(os.path.join('user_products', file), model_definition.model)
                 new_embedding_arr = []
 
@@ -94,17 +99,15 @@ if image_file is not None :
 
                 base_index = 0
 
-                neighbors, distances, indices = [], [], []
+                
+                distances, indices = [], []
 
-                #sex = 'Women'
+                
                 base_index = 0
 
                 if file == "Topwear.jpg" :
                     features = data_json[(data_json['category'] == 'topwear') & (data_json['sex']==sex)]['features'].tolist()
-                    #features = data_json[(data_json['category'] == 'topwear') & (data_json['sex']=='Women')]['features'].tolist()
-
-                    #neighbors = NearestNeighbors(n_neighbors=8, algorithm='brute', metric='euclidean').fit(list(features))
-                    #distances, indices = neighbors.kneighbors([new_feature])
+                   
 
                     neighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(list(topwear_features))
                     distances, indices = neighbors.kneighbors([new_feature_scaled])
@@ -121,15 +124,14 @@ if image_file is not None :
 
                 elif file == "Footwear.jpg" :
                     features = np.array(data_json[(data_json['category'] == 'footwear') & (data_json['sex']==sex)]['features'].tolist())
-                    print(features.shape)
+                  
 
-                    #try :
+                    
                     neighbors = NearestNeighbors(n_neighbors=15, algorithm='brute', metric='euclidean').fit(footwear_features)
                     distances, indices = neighbors.kneighbors([new_feature_scaled])
                     base_index = 387
                     st.header("\n Footwear Recommendations \n")
-                    #except :
-                        #pass
+                    
 
                 elif file == "Handbag.jpg" :
                     features = data_json[data_json['category'] == 'handbag']['features'].tolist()
@@ -145,7 +147,7 @@ if image_file is not None :
 
 
                 indexes = indices
-                #print(indexes)
+               
 
                 root_dir = 'Product'
 
@@ -169,11 +171,11 @@ if image_file is not None :
                     if len(links)>=5:
                         break
 
-                #print(filenames)
+                
 
                 counter = 0
 
-                #try :
+                
                 index = 0
                 for img_path in filenames :
                     try :
@@ -193,8 +195,9 @@ if image_file is not None :
                     except :
                         pass
 
-                #except :
-                    #pass
+            clear_folder('temp')
+            clear_folder('user_products')       
+                 
 
 
 
@@ -207,6 +210,10 @@ if image_file is not None :
         st.error("Not  full shot")
 
    
+
+
+
+
 
 
 

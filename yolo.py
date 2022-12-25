@@ -116,13 +116,13 @@ fps = -1
 #while True:
 
 #_, frame = capture.read()
-frame = cv2.imread('temp/input.jpg')
+#frame = cv2.imread('temp/input.jpg')
 #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 #frame = np.expand_dims(frame, axis=0) 
 #frame = cv2.normalize(frame,None,0,1,cv2.NORM_MINMAX,dtype=cv2.CV_32F)
-if frame is None:
-    print("End of stream")
-    exit()
+#if frame is None:
+    #print("End of stream")
+    #exit()
 
 
 def driver(img_path) :
