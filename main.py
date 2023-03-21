@@ -75,8 +75,13 @@ if image_file is not None :
 
         
             for file in os.listdir('user_products') :
-                
-                new_embedding = model_definition.extract_features(os.path.join('user_products', file), model_definition.model)
+
+                try :                                   
+                    new_embedding = model_definition.extract_features(os.path.join('user_products', file), model_definition.model)
+
+                except :
+                    print(file)
+
                 new_embedding_arr = []
 
                 for i in range(len(new_embedding)) :
@@ -178,9 +183,7 @@ if image_file is not None :
                 
                 index = 0
                 for img_path in filenames :
-                    try :
-
-                        
+                    try :                        
                         img = Image.open(img_path)
                         
                         index = filenames.index
