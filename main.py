@@ -79,15 +79,19 @@ if image_file is not None :
                 try :                                   
                     new_embedding = model_definition.extract_features(os.path.join('user_products', file), model_definition.model)
 
+                
+
+                    new_embedding_arr = []
+
+                    for i in range(len(new_embedding)) :
+                        new_embedding_arr.append(new_embedding[i])
+
+                    new_embedding = np.array(new_embedding)
+
+                
                 except :
                     print(file)
-
-                new_embedding_arr = []
-
-                for i in range(len(new_embedding)) :
-                    new_embedding_arr.append(new_embedding[i])
-
-                new_embedding = np.array(new_embedding)
+                
 
                 scaler = StandardScaler()
                 new_feature_scaled = scaler.fit_transform(new_embedding.reshape(-1,1))
